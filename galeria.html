@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galería - Luis & Maoly</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💍</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #1a1a1a;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            text-align: center;
+            margin-bottom: 40px;
+            color: #fff;
+            font-size: 2.5em;
+            letter-spacing: 2px;
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #d4af37, transparent);
+        }
+
+        #uploadInfo {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: rgba(212, 175, 55, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            backdrop-filter: blur(5px);
+        }
+
+        #uploadInfo a {
+            color: #d4af37;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        #uploadInfo a:hover {
+            color: #ffd700;
+            text-decoration: none;
+        }
+
+        .gallery-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 20px;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            cursor: pointer;
+            aspect-ratio: 1;
+            background-color: #2a2a2a;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.03) translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            opacity: 0;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .gallery-item img.loaded {
+            opacity: 1;
+        }
+
+        .gallery-item .placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #2a2a2a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-size: 18px;
+            color: #888;
+            font-weight: 300;
+        }
+
+        /* Spinner animation */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #333;
+            border-top: 3px solid #d4af37;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.95);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90vh;
+            margin-top: 50px;
+            border-radius: 8px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        .close {
+            position: absolute;
+            right: 35px;
+            top: 15px;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .close:hover {
+            opacity: 1;
+        }
+
+        .refresh-button {
+            display: block;
+            margin: 20px auto 30px;
+            padding: 12px 30px;
+            background-color: #d4af37;
+            color: #1a1a1a;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .refresh-button:hover {
+            background-color: #ffd700;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .gallery-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 2em;
+                margin-bottom: 30px;
+            }
+
+            .container {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Galería de Fotos</h1>
+        
+        <div id="uploadInfo">
+            Para subir fotos de la boda, visita la carpeta de Google Drive aqui 👉 
+            <a href="https://drive.google.com/drive/folders/1nxJDWtbedKQizseLgxyP8tylh7UefmNg" target="_blank">
+                Subir Fotos
+            </a>
+        </div>
+
+        <button class="refresh-button" onclick="loadImages()">Actualizar Fotos</button>
+        
+        <div id="gallery" class="gallery-container"></div>
+        <div id="loading" class="loading">Cargando fotos...</div>
+    </div>
+
+    <!-- Modal para ver imágenes -->
+    <div id="imageModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="modalImg">
+    </div>
+
+    <script>
+        const FOLDER_ID = '1nxJDWtbedKQizseLgxyP8tylh7UefmNg';
+        const gallery = document.getElementById('gallery');
+        const loading = document.getElementById('loading');
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImg');
+        const closeBtn = document.getElementsByClassName('close')[0];
+
+        // Intersection Observer para lazy loading
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    if (!img.src) {
+                        img.src = img.dataset.src;
+                        img.onload = () => {
+                            img.classList.add('loaded');
+                            const placeholder = img.parentElement.querySelector('.placeholder');
+                            if (placeholder) {
+                                placeholder.style.display = 'none';
+                            }
+                        };
+                    }
+                    observer.unobserve(img);
+                }
+            });
+        }, {
+            root: null,
+            rootMargin: '50px',
+            threshold: 0.1
+        });
+
+        // Cerrar modal
+        closeBtn.onclick = () => modal.style.display = 'none';
+        window.onclick = (e) => {
+            if (e.target == modal) modal.style.display = 'none';
+        };
+
+        function getImageUrl(fileId) {
+            return `https://lh3.googleusercontent.com/d/${fileId}`;
+        }
+
+        async function loadImages() {
+            loading.style.display = 'block';
+            gallery.innerHTML = '';
+
+            try {
+                const response = await fetch(`https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents+and+mimeType+contains+'image/'&orderBy=createdTime desc&key=AIzaSyA3H-AcNq0l-uQphc-gpOi22_xVIgxmvMI&fields=files(id,name)`);
+                const data = await response.json();
+
+                if (data.files && data.files.length > 0) {
+                    loading.style.display = 'none';
+                    data.files.forEach(file => {
+                        const div = document.createElement('div');
+                        div.className = 'gallery-item';
+                        
+                        // Crear placeholder con spinner
+                        const placeholder = document.createElement('div');
+                        placeholder.className = 'placeholder';
+                        const spinner = document.createElement('div');
+                        spinner.className = 'spinner';
+                        placeholder.appendChild(spinner);
+                        div.appendChild(placeholder);
+                        
+                        const img = document.createElement('img');
+                        img.dataset.src = getImageUrl(file.id);
+                        img.alt = file.name;
+                        
+                        img.onclick = () => {
+                            modal.style.display = 'block';
+                            modalImg.src = img.dataset.src;
+                        };
+                        
+                        div.appendChild(img);
+                        gallery.appendChild(div);
+                        
+                        // Observar la imagen para lazy loading
+                        imageObserver.observe(img);
+                    });
+                } else {
+                    loading.textContent = 'No hay fotos disponibles en este momento.';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                loading.textContent = 'Error al cargar las fotos. Por favor, intenta actualizar.';
+            }
+        }
+
+        // Cargar imágenes inicialmente
+        loadImages();
+
+        // Actualizar cada 60 segundos
+        setInterval(loadImages, 3000000);
+    </script>
+</body>
+</html>

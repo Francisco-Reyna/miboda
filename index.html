@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invitación - Luis & Maoly</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💍</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;500&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: #fff;
+            line-height: 1.6;
+            background: #1a1a1a; /* Un color de fondo sólido simple */
+            position: relative;
+        }
+        body.no-scroll { overflow: hidden; height: 100vh; }
+        .background-blur {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: url('https://images.unsplash.com/photo-1550005809-91ad75fb315f?q=80&w=2069&auto=format&fit=crop') center/cover no-repeat;
+            filter: blur(25px) brightness(0.5); transform: scale(1.1);
+            z-index: -1;
+        }
+        
+        /* Contenido principal que se oculta/muestra */
+        .main-content {
+            display: none; /* Oculto al principio */
+            width: 100%;
+            padding-top: 5vh; /* Un pequeño margen superior */
+            padding-bottom: 5vh; /* Un margen inferior para el scroll */
+        }
+        
+        #welcome-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+            z-index: 100; cursor: pointer; transition: opacity 1s, visibility 1s;
+        }
+        #welcome-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        #welcome-overlay h1 { font-family: 'Great+Vibes', cursive; font-size: 4rem; font-weight: 400; }
+        #welcome-overlay p { font-size: 1.2rem; margin: 10px 0 30px; }
+        #play-button {
+            background: linear-gradient(45deg, #ffd700, #d4af37); color: #1a1a1a; border: none; border-radius: 50px;
+            padding: 15px 40px; font-size: 1.1em; font-weight: 500; text-transform: uppercase;
+            letter-spacing: 1px; display: flex; align-items: center; gap: 10px;
+        }
+        
+        /* Contenedor de la invitación */
+        .invitation-container {
+            width: 90%; /* Ocupa el 90% del ancho de la pantalla */
+            max-width: 800px; /* Pero no más de 800px */
+            margin: 0 auto; /* Centrado */
+        }
+        
+        /* El truco del padding para mantener la proporción */
+        .canva-wrapper {
+            position: relative; width: 100%; height: 0; padding-top: 140.0000%;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+            overflow: hidden; border-radius: 8px;
+        }
+        .canva-wrapper iframe {
+            position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none;
+        }
+
+        /* Contenedor del botón "Más Información" */
+        .more-info-container {
+            width: 100%;
+            text-align: center;
+            margin-top: 40px; /* Espacio entre la invitación y el botón */
+        }
+        .back-button {
+            display: inline-flex;
+            background: linear-gradient(45deg, #ffd700, #d4af37); color: #1a1a1a;
+            text-decoration: none; border-radius: 50px; font-weight: 500;
+            text-transform: uppercase; letter-spacing: 1px; font-size: 1.1em;
+            align-items: center; justify-content: center; gap: 10px;
+            padding: 15px 40px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+        .back-button:hover { transform: translateY(-3px); }
+    </style>
+</head>
+<body class="no-scroll">
+
+    <div class="background-blur"></div>
+
+    <div id="welcome-overlay">
+        <h1>Luis & Maoly</h1>
+        <p>¡Nuestra boda!</p>
+        <button id="play-button">
+            <i class="fas fa-play"></i> VER INVITACIÓN
+        </button>
+    </div>
+    
+    <div class="main-content">
+        <div class="invitation-container">
+            <div class="canva-wrapper">
+              <iframe id="canva-iframe"
+                src="about:blank"  
+                data-src="https://www.canva.com/design/DAGoN_uh4YY/PmOblMrykwVV6ULNkRc6HA/watch?embed&autoplay=1&mute=1"
+                allow="autoplay; fullscreen"
+                allowfullscreen="true">
+              </iframe>
+            </div>
+        </div>
+        <div class="more-info-container">
+            <a href="frontal.html" class="back-button" id="info-button">
+                <i class="fas fa-info-circle"></i> MÁS INFORMACIÓN
+            </a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const welcomeOverlay = document.getElementById('welcome-overlay');
+            const mainContent = document.querySelector('.main-content');
+            const canvaIframe = document.getElementById('canva-iframe');
+            const body = document.body;
+            const infoButton = document.getElementById('info-button');
+            
+            const tiempoDeRedireccion = 60000;
+            let redirectTimer = null;
+
+            function startInvitation() {
+                welcomeOverlay.classList.add('hidden');
+                mainContent.style.display = 'block'; // Mostrar el contenido
+                body.classList.remove('no-scroll'); // Permitir scroll
+
+                const canvaSrc = canvaIframe.getAttribute('data-src');
+                canvaIframe.setAttribute('src', canvaSrc);
+
+                redirectTimer = setTimeout(() => {
+                    window.location.href = 'frontal.html';
+                }, tiempoDeRedireccion);
+            }
+
+            function handleInfoButtonClick(event) {
+                event.preventDefault(); 
+                if (redirectTimer) {
+                    clearTimeout(redirectTimer);
+                }
+                window.location.href = this.href;
+            }
+
+            welcomeOverlay.addEventListener('click', startInvitation, { once: true });
+            infoButton.addEventListener('click', handleInfoButtonClick);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- ... (tu <head> se queda igual) ... -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Boda</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* ... (tu CSS se queda igual, pero añado los estilos para el botón de eliminar) ... */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #1a1a1a;
+            color: #fff;
+            line-height: 1.6;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            display: none;
+        }
+
+        h1, h2 {
+            font-family: 'Playfair Display', serif;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #fff;
+            letter-spacing: 2px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #d4af37, transparent);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            color: #d4af37;
+            margin: 10px 0;
+            font-weight: 700;
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .chart-container {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .messages-container {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .message-card {
+            background-color: rgba(255, 255, 255, 0.03);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .message-author {
+            color: #d4af37;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            justify-content: center;
+        }
+
+        .export-button {
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            color: #1a1a1a;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .whatsapp-button {
+            background: linear-gradient(45deg, #25D366, #128C7E);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .export-button:hover,
+        .whatsapp-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .export-button i,
+        .whatsapp-button i {
+            font-size: 18px;
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .login-form input:focus {
+            outline: none;
+            border-color: #d4af37;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+        }
+
+        .songs-list {
+            margin-top: 30px;
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .song-item {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .song-item:last-child {
+            border-bottom: none;
+        }
+
+        .detailed-list {
+            margin-top: 30px;
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .guest-card {
+            background-color: rgba(255, 255, 255, 0.03);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .guest-name {
+            color: #d4af37;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .guest-details {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        /* ESTILOS PARA EL NUEVO BOTÓN */
+        .delete-button {
+            background-color: #cc0000;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .delete-button:hover {
+            background-color: #ff4444;
+            transform: translateY(-2px);
+        }
+        .delete-button i { font-size: 14px; }
+        .guest-card.deleting { opacity: 0; transform: scale(0.95); }
+    </style>
+</head>
+<body>
+    <div id="loginContainer" class="login-container">
+        <!-- ... (login se queda igual) ... -->
+        <h2>Acceso al Panel</h2>
+        <form id="loginForm" class="login-form">
+            <input type="password" id="password" placeholder="Contraseña" required>
+            <button type="submit" class="export-button">Acceder</button>
+        </form>
+        <div id="errorMessage" class="error-message">Contraseña incorrecta</div>
+    </div>
+
+    <div id="adminPanel" class="container">
+        <!-- ... (panel se queda igual) ... -->
+        <h1>Panel de Administración</h1>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Confirmados</h3>
+                <div id="confirmedCount" class="stat-number">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>No Asistirán</h3>
+                <div id="notAttendingCount" class="stat-number">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Invitados</h3>
+                <div id="totalGuestsCount" class="stat-number">0</div>
+            </div>
+        </div>
+
+        <div class="charts-container">
+            <div class="chart-container">
+                <canvas id="attendanceChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="dietaryChart"></canvas>
+            </div>
+        </div>
+
+        <div class="export-buttons">
+            <button id="exportButton" class="export-button">
+                <i class="fas fa-file-excel"></i>
+                Exportar a Excel
+            </button>
+            <button id="whatsappButton" class="whatsapp-button">
+                <i class="fab fa-whatsapp"></i>
+                Exportar a WhatsApp
+            </button>
+        </div>
+
+        <div class="messages-container">
+            <h2>Mensajes de los Invitados</h2>
+            <div id="messagesList"></div>
+        </div>
+
+        <div class="songs-list">
+            <h2>Canciones Solicitadas</h2>
+            <div id="songsList"></div>
+        </div>
+
+        <div class="detailed-list">
+            <h2>Lista Detallada de Invitados</h2>
+            <div id="guestsList"></div>
+        </div>
+    </div>
+
+    <script>
+        const ADMIN_PASSWORD = '123456';
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyCt4omdFJfPRcjbsFxX2VufZTfsU7a2Ad7kZZc__k072xem67Mjigje2cAVfbzz-SGTQ/exec';
+        
+        let allConfirmations = [];
+        let attendanceChart = null;
+        let dietaryChart = null;
+
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (document.getElementById('password').value === ADMIN_PASSWORD) {
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                loadAndRenderDashboard();
+            } else {
+                document.getElementById('errorMessage').style.display = 'block';
+            }
+        });
+
+        async function loadAndRenderDashboard() {
+            document.getElementById('confirmedCount').textContent = '...';
+            document.getElementById('notAttendingCount').textContent = '...';
+            document.getElementById('totalGuestsCount').textContent = '...';
+
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL);
+                if (!response.ok) throw new Error(`Error de red: ${response.statusText}`);
+                allConfirmations = await response.json();
+                renderDashboard();
+            } catch (error) {
+                console.error("Error al cargar datos:", error);
+                alert("Error al cargar datos desde Google Sheets.");
+            }
+        }
+
+        function renderDashboard() {
+            const confirmations = allConfirmations;
+            
+            const confirmed = confirmations.filter(c => c.attendance.startsWith('Sí'));
+            const notAttending = confirmations.filter(c => c.attendance.startsWith('No'));
+            const totalGuests = confirmed.reduce((sum, c) => sum + (parseInt(c.companions) || 1), 0);
+
+            document.getElementById('confirmedCount').textContent = confirmed.length;
+            document.getElementById('notAttendingCount').textContent = notAttending.length;
+            document.getElementById('totalGuestsCount').textContent = totalGuests;
+
+            if (attendanceChart) attendanceChart.destroy();
+            attendanceChart = new Chart(document.getElementById('attendanceChart'), {
+                type: 'doughnut', data: { labels: ['Asistirán', 'No Asistirán'], datasets: [{ data: [confirmed.length, notAttending.length], backgroundColor: ['#d4af37', '#ff6b6b'] }] },
+                options: { responsive: true, plugins: { title: { display: true, text: 'Distribución de Asistencia', color: '#fff' }, legend: { labels: { color: '#fff' }}}}
+            });
+
+            const dietaryData = {};
+            confirmed.forEach(c => { dietaryData[c.dietaryRestrictions] = (dietaryData[c.dietaryRestrictions] || 0) + 1; });
+            if (dietaryChart) dietaryChart.destroy();
+            dietaryChart = new Chart(document.getElementById('dietaryChart'), {
+                type: 'bar', data: { labels: Object.keys(dietaryData), datasets: [{ label: 'Restricciones', data: Object.values(dietaryData), backgroundColor: '#d4af37' }] },
+                options: { responsive: true, plugins: { title: { display: true, text: 'Restricciones Alimenticias', color: '#fff' }, legend: { display: false }},
+                    scales: { y: { ticks: { color: '#fff' }}, x: { ticks: { color: '#fff' }}}}
+            });
+
+            const messagesList = document.getElementById('messagesList');
+            messagesList.innerHTML = confirmations.filter(c => c.message).map(c => `<div class="message-card"><div class="message-author">${c.fullName}</div><div>${c.message}</div></div>`).join('');
+
+            const songsList = document.getElementById('songsList');
+            songsList.innerHTML = confirmations.filter(c => c.songRequest).map(c => `<div class="song-item">${c.songRequest}</div>`).join('');
+
+            const guestsList = document.getElementById('guestsList');
+            guestsList.innerHTML = confirmations.map(c => `
+                <div class="guest-card" id="guest-${c.timestamp}">
+                    <div class="guest-name">${c.fullName}</div>
+                    <div class="guest-details">
+                        <p>Teléfono: ${c.phone}</p>
+                        <p>Asistencia: ${c.attendance}</p>
+                        ${c.attendance.startsWith('Sí') ? `<p>Total en grupo: ${parseInt(c.companions) || 1}</p>` : ''}
+                        <p>Restricciones: ${c.dietaryRestrictions}${c.otherDietary ? ` - ${c.otherDietary}` : ''}</p>
+                        ${c.songRequest ? `<p>Canción: ${c.songRequest}</p>` : ''}
+                        <button class="delete-button" data-timestamp="${c.timestamp}">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Añadir event listeners a los nuevos botones de eliminar
+            document.querySelectorAll('.delete-button').forEach(button => {
+                button.addEventListener('click', handleDeleteGuest);
+            });
+        }
+        
+        // --- NUEVA FUNCIÓN PARA MANEJAR LA ELIMINACIÓN ---
+        async function handleDeleteGuest(event) {
+            const button = event.currentTarget;
+            const timestamp = button.dataset.timestamp;
+            
+            if (!confirm('¿Estás seguro de que deseas eliminar esta confirmación? Esta acción es permanente.')) {
+                return;
+            }
+
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Eliminando...';
+
+            const formData = new FormData();
+            formData.append('action', 'delete');
+            formData.append('timestamp', timestamp);
+            
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: formData });
+                const data = await response.json();
+
+                if (data.result === 'success') {
+                    // Animación de eliminación
+                    const card = document.getElementById(`guest-${timestamp}`);
+                    if (card) {
+                        card.classList.add('deleting');
+                        // Esperar a que termine la animación para recargar el panel
+                        setTimeout(() => {
+                            loadAndRenderDashboard();
+                        }, 300);
+                    } else {
+                        // Si no se encuentra la tarjeta, simplemente recargar
+                        loadAndRenderDashboard();
+                    }
+                } else {
+                    throw new Error(data.error || "Error desconocido al eliminar.");
+                }
+            } catch (error) {
+                console.error("Error al eliminar:", error);
+                alert(`No se pudo eliminar la confirmación: ${error.message}`);
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-trash"></i> Eliminar';
+            }
+        }
+
+        // --- Lógica de exportación (se queda igual) ---
+        document.getElementById('exportButton').addEventListener('click', () => {
+             const confirmations = allConfirmations;
+            let csv = 'Nombre,Teléfono,Asistencia,Acompañantes,Restricciones,Otras Restricciones,Canción,Mensaje\n';
+            confirmations.forEach(c => {
+                csv += `"${c.fullName}","${c.phone}","${c.attendance}","${c.companions || 1}","${c.dietaryRestrictions}","${c.otherDietary || ''}","${c.songRequest || ''}","${c.message || ''}"\n`;
+            });
+            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'confirmaciones_boda.csv';
+            link.click();
+        });
+
+        document.getElementById('whatsappButton').addEventListener('click', () => {
+            const confirmations = allConfirmations;
+            const confirmed = confirmations.filter(c => c.attendance.startsWith('Sí'));
+            const notAttending = confirmations.filter(c => c.attendance.startsWith('No'));
+            const totalGuests = confirmed.reduce((sum, c) => sum + (parseInt(c.companions) || 1), 0);
+            
+            let summary = `*📊 Resumen de Invitados*\n\n`;
+            summary += `*Confirmados:* ${confirmed.length} grupos\n`;
+            summary += `*Total Invitados (asistentes):* ${totalGuests}\n`;
+            summary += `*No Asistirán:* ${notAttending.length} grupos\n\n`;
+            summary += `*👥 Lista de Confirmados:*\n`;
+            confirmed.forEach(c => {
+                summary += `\n• ${c.fullName} (${c.companions || 1})`;
+            });
+            window.open(`https://wa.me/?text=${encodeURIComponent(summary)}`, '_blank');
+        });
+
+    </script>
+</body>
+</html>
