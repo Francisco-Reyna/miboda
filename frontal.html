@@ -152,6 +152,7 @@
             text-transform: uppercase;
             transition: all 0.3s ease;
             position: relative;
+            margin-top: 10px;
             padding: 5px 0;
         }
 
@@ -1612,6 +1613,57 @@
                 display: none;
             }
         }
+        /* --- ESTILOS ÚNICAMENTE PARA EL BOTÓN DE CONFIRMACIÓN LLAMATIVO --- */
+
+.cta-button {
+  /* Fondo dorado y texto oscuro para que resalte */
+  background: linear-gradient(45deg, #ffd700, #d4af37);
+  color: #1a1a1a !important; /* !important para asegurar que el color se aplique */
+  
+  /* Relleno y bordes redondeados para darle forma de botón */
+  padding: 10px 20px !important;
+  border-radius: 50px;
+  
+  /* Hacemos el texto más notorio */
+  font-weight: 700 !important;
+  
+  /* Sombra para darle profundidad */
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+
+  /* Animación de "pulso" para atraer la mirada */
+  animation: pulse-animation 2s infinite;
+}
+
+/* Efecto al pasar el cursor por encima */
+.cta-button:hover {
+  transform: scale(1.05); /* Se agranda un poco */
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+  /* Quitamos la línea de abajo al pasar el cursor, ya que no la necesita */
+  text-decoration: none !important; 
+}
+
+/* El keyframe que define la animación de pulso */
+@keyframes pulse-animation {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+  }
+  50% {
+    transform: scale(1.03); /* Un sutil crecimiento */
+    box-shadow: 0 4px 30px rgba(255, 215, 0, 0.5); /* Sombra más brillante */
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+  }
+}
+
+/* Para asegurar que el efecto de línea de abajo no aparezca en el botón */
+.cta-button::after {
+    display: none !important;
+}
+
+        
     </style>
 </head>
 <body>
@@ -1623,7 +1675,7 @@
             <div class="nav-links">
                 <a href="#inicio">Inicio</a>
                 <a href="galeria.html">Galería</a>
-                <a href="confirmacion.html">Confirmar Asistencia</a>
+                <a href="confirmacion.html" class="cta-button">Confirmar Asistencia</a>
             </div>
         </div>
     </nav>
